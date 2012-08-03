@@ -27,125 +27,13 @@ const std::string JPSocket::moduleName = "SOC";
  * Protected methods
  */
 /**
- * Public methods
- */
-/**
- * Class constructor
- *
- * @param log Pointer to a logger
- * @param address String with the ip address
- * @param port Integer with the number of the port
- */
-JPSocket::JPSocket(Logger * log, std::string address, int port ){
-	logger = log;
-
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPSocket(%s,%d)", address.c_str(), port);
-
-	struct hostent *server;
-	server = gethostbyname(address.c_str());
-	if (server == NULL) {
-		logger->log(JPSocket::moduleName,M_LOG_HGH,M_LOG_WRN,"Address[%s] is not valid", address.c_str());
-		throw JPInvHostname();
-	}
-	std::string ip(server->h_addr);
-	this->addressVersion = JPIpAddress::checkIpVersion(server->h_addr);
-	if( AF_INET == addressVersion ){
-		this->address = new JPSocketIPv4();
-		this->address->setIp(ip);
-	}else{
-		this->address = new JPSocketIPv6();
-		this->address->setIp(ip);
-	}
-
-	port = htons(port);
-
-
-
-}
-/**
- * Empty constructor
- * @param log Pointer to a logger
- */
-JPSocket::JPSocket(Logger * log){
-	logger = log;
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPSocket()");
-	socketfd = -1;
-	addressVersion = -1;
-	port = -1;
-	address = NULL;
-}
-/**
- * Copy class constructor
- * This constructor should be used if socket is already
- * created
- * @param copyFrom Object from wish we want to copy
- */
-JPSocket::JPSocket( const JPSocket& copyFrom ){
-	logger = copyFrom.logger;
-	socketfd = copyFrom.socketfd;
-	addressVersion = copyFrom.addressVersion;
-	port = copyFrom.port;
-	*address = *(copyFrom.address);
-}
-/**
- * Class destructor
- */
-JPSocket::~JPSocket(){}
-
-/**
- * Send a message to the socket
- * @param msg Message to be sent through the socket
- * @return Integer 0 in case of success
- */
-int 
-JPSocket::send(std::string * msg){
-	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::send(%s)",msg->c_str());
-	return send_int( msg );
-}
-/**
- * Internal function used to write a message into
- * the socket
- * @param msg Message to be sent through the socket
- * @return Integer 0 in case of success
- */
-int 
-JPSocket::send_int(std::string * msg)
-{
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"send_int(%p) on socket[%d]", msg, socketfd);
-
-	int n = ::send(socketfd,msg->data(),msg->size(),0);
-	if (n < 0){
-		logger->log("ERROR writing to socket",JPSocket::moduleName,M_LOG_HGH,M_LOG_WRN);
-		throw JPErrSend(true);
-	}
-
-	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"Sent following message %s",msg->c_str());
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Message sent size was %d",n);
-
-	return 0;
-}
-/**
- * Read a message from the socket
- * @param strsize	Size of the message that want to be readed
- * @param msg		String where the message will be placed
- * @return Integer 0 in case of success
- */
-int 
-JPSocket::receive(int strsize, std::string **msg){
-	if( NULL != msg )
-		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::receive(%d,%s)",strsize,(*msg)->c_str());
-	else
-		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::receive(%d,NULL)",strsize);
-	return receive_int( strsize , msg );
-}
-/**
  * Internal function used to read a message from the socket
  * @param strsize	Size of the message that want to be read
  * @param msg		String where the message will be placed
  * @return Integer 0  in case of success
  *                 >0 Length read
  */
-int 
+int
 JPSocket::receive_int(int strsize, std::string **msg){
 	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"receive_int(%d,%p) on socket[%d]", strsize,msg, socketfd);
 	if( NULL != *msg )
@@ -174,7 +62,217 @@ JPSocket::receive_int(int strsize, std::string **msg){
 	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Message received size was %d",length);
 	return length;
 }
+/**
+ * Internal function used to write a message into
+ * the socket
+ * @param msg Message to be sent through the socket
+ * @return Integer 0 in case of success
+ */
+int
+JPSocket::send_int(std::string * msg)
+{
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"send_int(%p) on socket[%d]", msg, socketfd);
 
+	int n = ::send(socketfd,msg->data(),msg->size(),0);
+	if (n < 0){
+		logger->log("ERROR writing to socket",JPSocket::moduleName,M_LOG_HGH,M_LOG_WRN);
+		throw JPErrSend(true);
+	}
+
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"Sent following message %s",msg->c_str());
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Message sent size was %d",n);
+
+	return 0;
+}
+/**
+ * Handle the address
+ * @param address String with the ip address
+ * @param port Integer with the number of the port
+ * @return Integer 0 in case of success
+ */
+int
+JPSocket::handleAddress( std::string address, int port ){
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPSocket::handleAddress(%p)", address.c_str(), port);
+	int tmp_addressVersion = addressVersion;
+
+
+	addressVersion = JPIpAddress::checkIpVersion(address);
+	if( (-1 != socketfd ) && (tmp_addressVersion != addressVersion) ){
+		addressVersion = tmp_addressVersion;
+		throw JPGenericSocket("The IP address is does not match the socket domain!");
+	}
+	if( AF_INET == addressVersion ){
+		this->address = new JPSocketIPv4();
+		this->address->setIp(address);
+	}else{
+		this->address = new JPSocketIPv6();
+		this->address->setIp(address);
+	}
+
+	this->port = htons(port);
+}
+/**
+ * Creates the socket
+ * @param domain Specifies  a  communication  domain
+ * @param type Specifies the communication semantics
+ * @param protocol Specifies a particular protocol to be used with the socket
+ */
+int
+JPSocket::create_int(int type, int protocol){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::create(%d,%d)",type,protocol);
+
+	socketfd = socket(addressVersion, type, protocol);
+	if( -1 == socketfd )
+		throw JPNoSocketCreated(true);
+	this->protocol = protocol;
+	this->typeOfSocket = type;
+}
+/**
+ * Public methods
+ */
+/**
+ * Class constructor
+ *
+ * @param log Pointer to a logger
+ * @param address String with the ip address
+ * @param port Integer with the number of the port
+ */
+JPSocket::JPSocket(Logger * log, std::string address, int port ){
+	logger = log;
+
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPSocket(%s,%d)", address.c_str(), port);
+
+	socketfd = -1;
+	protocol = -1;
+	handleAddress(address , port );
+
+
+}
+/**
+ * Empty constructor
+ * @param log Pointer to a logger
+ */
+JPSocket::JPSocket(Logger * log){
+	logger = log;
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPSocket()");
+	socketfd = -1;
+	addressVersion = -1;
+	port = -1;
+	address = NULL;
+	protocol = -1;
+	typeOfSocket = -1;
+}
+/**
+ * Copy class constructor
+ * This constructor should be used if socket is already
+ * created
+ * @param copyFrom Object from wish we want to copy
+ */
+JPSocket::JPSocket( const JPSocket& copyFrom ){
+	logger = copyFrom.logger;
+	socketfd = copyFrom.socketfd;
+	addressVersion = copyFrom.addressVersion;
+	port = copyFrom.port;
+	if( AF_INET == addressVersion )
+		this->address = new JPSocketIPv4();
+	else
+		this->address = new JPSocketIPv6();
+
+	*this->address= *copyFrom.address;
+	protocol = copyFrom.protocol;
+	typeOfSocket = copyFrom.typeOfSocket;
+}
+/**
+ * Class destructor
+ */
+JPSocket::~JPSocket(){}
+
+/**
+ * Send a message to the socket
+ * @param msg Message to be sent through the socket
+ * @return Integer 0 in case of success
+ */
+int 
+JPSocket::send(std::string * msg){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::send(%s)",msg->c_str());
+	return send_int( msg );
+}
+/**
+ * Read a message from the socket
+ * @param strsize	Size of the message that want to be readed
+ * @param msg		String where the message will be placed
+ * @return Integer 0 in case of success
+ */
+int 
+JPSocket::receive(int strsize, std::string **msg){
+	if( NULL != msg )
+		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::receive(%d,%s)",strsize,(*msg)->c_str());
+	else
+		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::receive(%d,NULL)",strsize);
+	return receive_int( strsize , msg );
+}
+
+/**
+ * Connects the socket to the address defined
+ * @return Integer 0 in case of success
+ */
+int
+JPSocket::connect(){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::connect()");
+	if( -1 == socketfd )
+		throw JPInvSocket();
+	const struct sockaddr *addr = address->getIp();
+	int connect_return = ::connect(socketfd, addr, sizeof(addr));
+
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Trying to connect on address[%s:%d]",socketfd,port);
+
+	if( -1 == connect_return )
+		throw JPGenericSocket("Unable to connect to defined address!",true);
+
+	return 0;
+}
+/**
+ * Connects the socket to the address defined
+ * @param address String with the ip address
+ * @param port Integer with the number of the port
+ * @return Integer 0 in case of success
+ */
+int
+JPSocket::connect(std::string address, int port){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::connect(%s,%d)",address.c_str(),port);
+	handleAddress( address, port );
+	return connect();
+}
+/**
+ * Bind an the address with the socket
+ * @return Integer 0 in case of success
+ */
+int
+JPSocket::bind(){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::bind()");
+	if( -1 == socketfd )
+		throw JPInvSocket();
+	const struct sockaddr* addr = address->getIp();
+
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Trying to bind on address[%s:%d]",socketfd,port);
+
+	int bind_return = ::bind(socketfd, addr, sizeof(addr));
+	if( -1 == bind_return )
+		throw JPGenericSocket("Unable to bind to address!",true);
+	return 0;
+}
+/**
+ * Bind an the address with the socket
+ * @param address String with the ip address
+ * @param port Integer with the number of the port
+ * @return Integer 0 in case of success
+ */
+int
+JPSocket::bind(std::string address, int port){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::bind(%s,%d)",address.c_str(),port);
+	handleAddress(address , port );
+	return bind();
+}
 /**
  * End the socket connectiorn
  * @param type Type of connection end
@@ -213,7 +311,7 @@ std::string
 JPSocket::getIp(){
 	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"getIp()");
 	if( this->addressVersion != -1 )
-		return address->getIp();
+		return address->getCharIp();
 
 	logger->log(JPSocket::moduleName,M_LOG_HGH,M_LOG_DBG,"Invalid ip address type");
 	throw JPInvIpAddress();

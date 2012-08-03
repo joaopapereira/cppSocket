@@ -15,13 +15,34 @@ namespace cppLibs{
 	class JPUdpSocket: public JPSocket{
 		public:
 		/**
-		 * Constructor
+		 * Class constructor
+		 *
+		 * @param log Pointer to a logger
+		 * @param address String with the ip address
+		 * @param port Integer with the number of the port
 		 */
-		JPUdpSocket();
+		JPUdpSocket(Logger * log, std::string address, int port);
+		/**
+		 * Empty constructor
+		 * @param log Pointer to a logger
+		 */
+		JPUdpSocket(Logger * log);
+		/**
+		 * Copy class constructor
+		 * This constructor should be used if socket is already
+		 * created
+		 * @param copyFrom Object from wish we want to copy
+		 */
+		JPUdpSocket( const JPUdpSocket& copyFrom );
 		/**
 		 * Constructor
 		 */
 		~JPUdpSocket();
+		/**
+		 * Creates the socket
+		 * @return Integer 0 in case of success
+		 */
+		virtual int create();
 	};
 
 

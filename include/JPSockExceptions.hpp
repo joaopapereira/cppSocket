@@ -75,7 +75,7 @@ namespace cppLibs{
 		 * @param error Error message
 		 * @param showErrno Indicates if the ERRNO should be or not written
 		 */
-		JPGenericSocket( char* error,bool showErrno = false ) throw():SocketExceptions(error,showErrno){};
+		JPGenericSocket( const char* error,bool showErrno = false ) throw():SocketExceptions(error,showErrno){};
 		/**
 		 * Constructor used when no message needs to be passed
 		 * @param error Error message
@@ -126,6 +126,17 @@ namespace cppLibs{
 		 * @param showErrno Indicates if the ERRNO should be or not written
 		 */
 		JPErrEmptySocket(bool showErrno = false) throw():SocketExceptions("Socket as no data",showErrno){};
+	};
+	/**
+	 * Generalization classes with the Exceptions
+	 */
+	class JPInvSocket: public SocketExceptions{
+	public:
+		/**
+		 * Constructor used when no message needs to be passed
+		 * @param showErrno Indicates if the ERRNO should be or not written
+		 */
+		JPInvSocket(bool showErrno = false) throw():SocketExceptions("Invalid socket",showErrno){};
 	};
 };
 #endif

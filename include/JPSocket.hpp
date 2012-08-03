@@ -41,6 +41,11 @@ namespace cppLibs{
 			 * Class destructor
 			 */
 			~JPSocket();
+			/**
+			 * Creates the socket
+			 * @return Integer 0 in case of success
+			 */
+			virtual int create() = 0;
 
 			/**
 			 * Send a message to the socket
@@ -55,7 +60,30 @@ namespace cppLibs{
 			 * @return Integer 0 in case of success
 			 */
 			int receive(int strsize, std::string **msg);
-
+			/**
+			 * Connects the socket to the address defined
+			 * @return Integer 0 in case of success
+			 */
+			int connect();
+			/**
+			 * Connects the socket to the address defined
+			 * @param address String with the ip address
+			 * @param port Integer with the number of the port
+			 * @return Integer 0 in case of success
+			 */
+			int connect(std::string address, int port);
+			/**
+			 * Bind an the address with the socket
+			 * @return Integer 0 in case of success
+			 */
+			int bind();
+			/**
+			 * Bind an the address with the socket
+			 * @param address String with the ip address
+			 * @param port Integer with the number of the port
+			 * @return Integer 0 in case of success
+			 */
+			int bind(std::string address, int port);
 			/**
 			 * End the socket connectiorn
 			 * @param type Type of connection end
@@ -91,6 +119,22 @@ namespace cppLibs{
 			 * Port used on this socket
 			 */
 			int port;
+
+			/**
+			 * Address version can have 5 values:
+			 * SOCK_STREAM     Provides sequenced, reliable, two-way, connection-based byte streams.  An out-of-band data transmission mechanism may be supported.
+			 *
+       	   	 * SOCK_DGRAM      Supports datagrams (connectionless, unreliable messages of a fixed maximum length).
+       	   	 * SOCK_SEQPACKET  Provides a sequenced, reliable, two-way connection-based data transmission path for datagrams of fixed maximum length; a consumer is required to read  an
+             *                 entire packet with each input system call.
+       	   	 * SOCK_RAW        Provides raw network protocol access.
+       	   	 * SOCK_RDM	       Provides a reliable datagram layer that does not guarantee ordering.
+			 */
+			int typeOfSocket;
+			/**
+			 * Protocol used on the socket
+			 */
+			int protocol;
 			/**
 			 * Pointer to a logger
 			 */
@@ -99,6 +143,13 @@ namespace cppLibs{
 			 * Ip address
 			 */
 			JPIpAddress * address;
+			/**
+			 * Handle the address
+			 * @param address String with the ip address
+			 * @param port Integer with the number of the port
+			 * @return Integer 0 in case of success
+			 */
+			int handleAddress( std::string address, int port );
 
 			/**
 			 * Internal function used to write a message into
@@ -114,6 +165,12 @@ namespace cppLibs{
 			 * @return Integer >0 Length read
 			 */
 			int receive_int(int strsize, std::string **msg);
+			/**
+			 * Creates the socket
+			 * @param type Specifies the communication semantics
+			 * @param protocol Specifies a particular protocol to be used with the socket
+			 */
+			int create_int(int type, int protocol);
 
 	
 	};

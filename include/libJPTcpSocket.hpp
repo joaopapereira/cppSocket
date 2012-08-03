@@ -15,13 +15,35 @@ namespace cppLibs{
 	class JPTcpSocket: public JPSocket{
 		public:
 		/**
-		 * Constructor
+		 * Class constructor
+		 *
+		 * @param log Pointer to a logger
+		 * @param address String with the ip address
+		 * @param port Integer with the number of the port
 		 */
-		JPTcpSocket();
+		JPTcpSocket(Logger * log, std::string address, int port);
+		/**
+		 * Empty constructor
+		 * @param log Pointer to a logger
+		 */
+		JPTcpSocket(Logger * log);
+		/**
+		 * Copy class constructor
+		 * This constructor should be used if socket is already
+		 * created
+		 * @param copyFrom Object from wish we want to copy
+		 */
+		JPTcpSocket( const JPTcpSocket& copyFrom );
 		/**
 		 * Constructor
 		 */
 		~JPTcpSocket();
+		/**
+		 * Creates the socket
+		 * @return Integer 0 in case of success
+		 */
+		virtual int create();
+
 	};
 
 	class JPNonBlockSocket: public JPTcpSocket{
@@ -79,7 +101,6 @@ namespace cppLibs{
 			 * @return Integer 0 in case of success
 			 */
 			int send( std::string * msg );
-			int setSoc( int sockId );
 		private:
 			fd_set read_flags,write_flags;
 			/**
