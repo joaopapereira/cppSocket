@@ -101,6 +101,8 @@ JPSocket::handleAddress( std::string address, int port ){
 		addressVersion = tmp_addressVersion;
 		throw JPGenericSocket("The IP address is does not match the socket domain!");
 	}
+	if( NULL != this->address )
+		delete this->address;
 	if( AF_INET == addressVersion ){
 		this->address = new JPSocketIPv4();
 		this->address->setIp(address);
@@ -109,7 +111,7 @@ JPSocket::handleAddress( std::string address, int port ){
 		this->address->setIp(address);
 	}
 
-	this->port = htons(port);
+	this->port = port;
 }
 /**
  * Creates the socket
@@ -121,6 +123,10 @@ int
 JPSocket::create_int(int type, int protocol){
 	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::create(%d,%d)",type,protocol);
 
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"going to create a socket with values(%d,%d,%d)",addressVersion,type,protocol);
+
+	if( -1 == addressVersion )
+		throw JPGenericSocket("The Ip should have been setted by now!");
 	socketfd = socket(addressVersion, type, protocol);
 	if( -1 == socketfd )
 		throw JPNoSocketCreated(true);
@@ -144,6 +150,7 @@ JPSocket::JPSocket(Logger * log, std::string address, int port ){
 
 	socketfd = -1;
 	protocol = -1;
+	this->address = NULL;
 	handleAddress(address , port );
 
 
@@ -254,9 +261,10 @@ JPSocket::bind(){
 		throw JPInvSocket();
 	const struct sockaddr* addr = address->getIp();
 
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Trying to bind on address[%s:%d]",socketfd,port);
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Trying to bind on address[%s:%d]",address->getCharIp().c_str(),port);
 
-	int bind_return = ::bind(socketfd, addr, sizeof(addr));
+
+	int bind_return = ::bind(socketfd, addr, sizeof(*addr));
 	if( -1 == bind_return )
 		throw JPGenericSocket("Unable to bind to address!",true);
 	return 0;
@@ -272,6 +280,40 @@ JPSocket::bind(std::string address, int port){
 	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::bind(%s,%d)",address.c_str(),port);
 	handleAddress(address , port );
 	return bind();
+}
+/**
+ * Listen on port IP
+ * @return Integer 0 in case of success
+ */
+int
+JPSocket::listen(){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::listen()");
+	if( -1 == socketfd )
+		throw JPInvSocket();
+	if( 0 > ::listen(socketfd,5) )
+		throw JPGenericSocket("Error putting socket to listening mode!",true);
+
+}
+/**
+ * Listen on port IP
+ * @return Integer 0 in case of success
+ */
+int
+JPSocket::accept(JPSocket* socket){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"accept(%p)",socket);
+	int newsockfd;
+	struct sockaddr cliAddr;
+	socklen_t cliLen;
+	newsockfd = ::accept(socketfd,
+		(struct sockaddr *) &cliAddr,
+		&cliLen);
+	if (newsockfd < 0)
+		throw SocketExceptions("Error accepting new connection!",true)
+
+	logger->log(moduleName,M_LOG_LOW,M_LOG_TRC,"newsocecktid=(%d),listen on=%d",newsockfd,socketfd);
+	JPIpAddress * addr = new JPIpAddress();
+
+	return 0;
 }
 /**
  * End the socket connectiorn
@@ -315,6 +357,18 @@ JPSocket::getIp(){
 
 	logger->log(JPSocket::moduleName,M_LOG_HGH,M_LOG_DBG,"Invalid ip address type");
 	throw JPInvIpAddress();
+}
+/**
+ * Get the Ip where the socket is binded
+ * or the Ip where the socket is connected to
+ * depending if this socket is being used as a
+ * server or a client
+ * @return String with the IP address
+ */
+int
+JPSocket::setAddress( std::string address, int port ){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::setAddress(%s,%d)",address.c_str(), port);
+	handleAddress(address ,port );
 }
 #if 0
 /**

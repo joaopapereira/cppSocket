@@ -38,7 +38,18 @@ JPIpAddress::setIp( std::string ip ){
 	hint.ai_family = PF_UNSPEC;
 
 	ret = getaddrinfo(ip.c_str(), NULL, &hint, &res);
-	memcpy(&address, res->ai_addr, sizeof(address));
+	memcpy(&address, res->ai_addr, res->ai_addrlen);
+	std::cout << "address:" << res->ai_addr<< std::endl;
+	return 0;
+}
+/**
+ * Set Ip address of the socket
+ * @param addr IP Address of the socket
+ * @return Integer 0 in case of error
+ */
+int
+JPIpAddress::setIp( struct sockaddr address , socklen_t size){
+	memcpy(&this->address, &address, size);
 	return 0;
 }
 /**
@@ -48,7 +59,7 @@ JPIpAddress::setIp( std::string ip ){
  */
 void
 JPIpAddress::int_getIp(char * result, int family){
-	inet_ntop(family,& address, result,
+	inet_ntop(family,(struct sockaddr*)& address, result,
 			  sizeof(result));
 }
 

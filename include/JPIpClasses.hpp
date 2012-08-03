@@ -27,6 +27,12 @@ namespace cppLibs{
 		 */
 		int setIp( std::string ip );
 		/**
+		 * Set Ip address of the socket
+		 * @param addr IP Address of the socket
+		 * @return Integer 0 in case of error
+		 */
+		int setIp( struct sockaddr address, socklen_t size );
+		/**
 		 * function to retrieve
 		 * the IP
 		 * @return Ip address in readable format

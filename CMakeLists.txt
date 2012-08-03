@@ -29,10 +29,11 @@ PROJECT ( JPSocketsLib CXX )
 INCLUDE_DIRECTORIES( include lib ${INSTALL_LIBS} ${INSTALL_INCS})
 
 ADD_SUBDIRECTORY( src lib )
+ADD_SUBDIRECTORY( exampleProgram bin )
 #####################################
 # Search for needed lib
 #####################################
-FIND_LIBRARY(logger REQUIRED)
+FIND_LIBRARY( JPLoggerStatic REQUIRED)
 FIND_LIBRARY( LOGGER_LIBRARY NAMES logger
                 PATHS ${LOCAL_LIBS} ${INSTALL_LIBS} )
 SET( LIBS ${LIBS} ${LOGGER_LIBRARY})

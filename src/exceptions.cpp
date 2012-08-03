@@ -22,8 +22,9 @@ using namespace cppLibs;
  * @param showErrno Indicates if the ERRNO should be or not written
  */
 SocketExceptions::SocketExceptions( const char* error, bool showErrno ) throw(){
+	this->showErrno = showErrno;
 	setMsg(error);
-	this->showErrno = (char*)showErrno;
+
 }
 /**
  * Constructor used when no message needs to be passed
@@ -41,7 +42,7 @@ SocketExceptions::SocketExceptions( bool showErrno ) throw(){
 void
 SocketExceptions::setMsg(const char * error) throw(){
 	myerror = error;
-	if( showErrno && errno != 0 ){
+	if( showErrno && ( errno != 0 ) ){
 		myerror += "[" ;
 		myerror += strerror(errno);
 		myerror += "]";

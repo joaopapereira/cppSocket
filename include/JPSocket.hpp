@@ -85,6 +85,16 @@ namespace cppLibs{
 			 */
 			int bind(std::string address, int port);
 			/**
+			 * Listen on port IP
+			 * @return Integer 0 in case of success
+			 */
+			int listen();
+			/**
+			 * Listen on port IP
+			 * @return Integer 0 in case of success
+			 */
+			 int accept(JPSocket*);
+			/**
 			 * End the socket connectiorn
 			 * @param type Type of connection end
 			 * 				M_DISC_GRACE If want to wait for acknowledge
@@ -102,6 +112,13 @@ namespace cppLibs{
 			 * @return String with the IP address
 			 */
 			std::string getIp();
+			/**
+			 * Set the address to be used
+			 * @param address String with the ip address
+			 * @param port Integer with the number of the port
+			 * @return Integer 0 in case of success
+			 */
+			int setAddress( std::string address, int port );
 	
 		protected:
 			static const std::string moduleName;
