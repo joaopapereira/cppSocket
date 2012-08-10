@@ -15,27 +15,37 @@
 
 #include <extlibs/libJPLogger.h>
 #include <libJPTcpSocket.hpp>
+#include <JPSockExceptions.hpp>
+#include <stdlib.h>
+#include <errno.h>
 using namespace cppLibs;
 // With this option will disable the debug to screen and do not allow any default log to be written
 #define DEBUG 0
 int main(void) {
   Logger log("/tmp/test.log");
-  log.setLogLvl("SOC",M_LOG_MAX,M_LOG_ALLLVL);
+  log.setLogLvl("SOC",M_LOG_MIN,M_LOG_ALLLVL);
 
   JPTcpSocket cli(&log);
-  cli.create();
-  std::string ip("localhost");
-  cli.connect(ip,9999);
-  std::string msg("panado com pao");
-  cli.send(&msg);
+  try{
+	  std::string ip("127.0.0.1");
+	  cli.setAddress(&ip,9999);
+	  cli.create();
 
-  std::string * recv;
-  cli.receive(100,&recv);
+	  cli.connect(&ip,9999);
+	  std::string msg("panado com pao");
+	  cli.send(&msg);
 
-  std::cout << "the message received was: "<< *recv<< std::endl;
+	  std::string * recv = new std::string();
+	  cli.receive(100,&recv);
 
-  cli.disconnect();
+	  std::cout << "the message received was: "<< *recv<< std::endl;
 
+	  cli.disconnect();
+  }catch( SocketExceptions &e){
+      std::cerr << e.what()<< std::endl;
+      std::cerr << errno << std::endl;
+      exit(-1);
+  }
 
 
   return 0;

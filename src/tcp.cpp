@@ -33,9 +33,9 @@ using namespace cppLibs;
  * @param address String with the ip address
  * @param port Integer with the number of the port
  */
-JPTcpSocket::JPTcpSocket(Logger * log, std::string address, int port)
+JPTcpSocket::JPTcpSocket(Logger * log, std::string * address, int port)
 	: JPSocket(log, address, port){
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPTcpSocket(%s,%d)", address.c_str(), port );
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPTcpSocket(%s,%d)", address->c_str(), port );
 }
 /**
  * Empty constructor
@@ -68,6 +68,50 @@ int
 JPTcpSocket::create(){
 	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPTcpSocket::create()");
 	return create_int(SOCK_STREAM, IPPROTO_TCP );
+}
+/**
+ * Listen on port IP
+ * @return Integer 0 in case of success
+ */
+int
+JPTcpSocket::listen(){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::listen()");
+	if( -1 == socketfd )
+		throw JPInvSocket();
+	if( 0 > ::listen(socketfd,5) )
+		throw JPGenericSocket("Error putting socket to listening mode!",true);
+
+	connStab = 1;
+
+}
+/**
+ * Listen on port IP
+ * @return Integer 0 in case of success
+ */
+int
+JPTcpSocket::accept(JPSocket* socket){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"accept(%p)",socket);
+	int newsockfd,oldsocket;
+	struct sockaddr_storage cliAddr;
+	socklen_t cliLen = sizeof(cliAddr);
+	newsockfd = ::accept(socketfd,
+		(struct sockaddr *) &cliAddr,
+		&cliLen);
+	if (newsockfd < 0)
+		throw SocketExceptions("Error accepting new connection!",true);
+
+	logger->log(moduleName,M_LOG_LOW,M_LOG_TRC,"newsocecktid=(%d),listen on=%d",newsockfd,socketfd);
+	//JPIpAddress * addr = new JPIpAddress();
+	//TODO: This part need to be changed
+	oldsocket = socketfd;
+	socketfd = newsockfd;
+	*socket = *this;
+	socketfd = oldsocket;
+	socket->setAddress(cliAddr, cliLen);
+
+
+
+	return 0;
 }
 /**
  * END }
@@ -119,7 +163,7 @@ JPNonBlockSocket::nonblock(){
  * @param address String with the ip address
  * @param port Integer with the number of the port
  */
-JPNonBlockSocket::JPNonBlockSocket(Logger * log, std::string address, int port)
+JPNonBlockSocket::JPNonBlockSocket(Logger * log, std::string * address, int port)
 	: JPTcpSocket(log, address, port){
 	nonblock();
 }

@@ -24,7 +24,7 @@ namespace cppLibs{
 			 * @param address String with the ip address
 			 * @param port Integer with the number of the port
 			 */
-			JPSocket( Logger * log , std::string address, int port );
+			JPSocket( Logger * log , std::string *address, int port );
 			/**
 			 * Empty constructor
 			 * @param log Pointer to a logger
@@ -71,7 +71,7 @@ namespace cppLibs{
 			 * @param port Integer with the number of the port
 			 * @return Integer 0 in case of success
 			 */
-			int connect(std::string address, int port);
+			int connect(std::string *address, int port);
 			/**
 			 * Bind an the address with the socket
 			 * @return Integer 0 in case of success
@@ -83,17 +83,7 @@ namespace cppLibs{
 			 * @param port Integer with the number of the port
 			 * @return Integer 0 in case of success
 			 */
-			int bind(std::string address, int port);
-			/**
-			 * Listen on port IP
-			 * @return Integer 0 in case of success
-			 */
-			int listen();
-			/**
-			 * Listen on port IP
-			 * @return Integer 0 in case of success
-			 */
-			 int accept(JPSocket*);
+			int bind(std::string * address, int port);
 			/**
 			 * End the socket connectiorn
 			 * @param type Type of connection end
@@ -118,7 +108,14 @@ namespace cppLibs{
 			 * @param port Integer with the number of the port
 			 * @return Integer 0 in case of success
 			 */
-			int setAddress( std::string address, int port );
+			int setAddress( std::string *address, int port );
+			/**
+			 * Set the address to be used
+			 * @param address Socket address
+			 * @param size Size of the address
+			 * @return Integer 0 in case of success
+			 */
+			int setAddress( struct sockaddr_storage address , socklen_t size );
 	
 		protected:
 			static const std::string moduleName;
@@ -157,6 +154,10 @@ namespace cppLibs{
 			 */
 			Logger * logger;
 			/**
+			 * Connection stablished
+			 */
+			int connStab;
+			/**
 			 * Ip address
 			 */
 			JPIpAddress * address;
@@ -166,7 +167,14 @@ namespace cppLibs{
 			 * @param port Integer with the number of the port
 			 * @return Integer 0 in case of success
 			 */
-			int handleAddress( std::string address, int port );
+			int handleAddress( std::string *address, int port );
+			/**
+			 * Handle the address
+			 * @param address Address structure
+			 * @param size Size of the structure
+			 * @return Integer 0 in case of success
+			 */
+			int handleAddress( struct sockaddr_storage address, socklen_t size );
 
 			/**
 			 * Internal function used to write a message into

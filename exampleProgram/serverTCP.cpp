@@ -27,26 +27,32 @@ int main(void) {
   log.log("SOC",M_LOG_NRM,M_LOG_DBG,"Starting application");
 
   JPTcpSocket srv(&log);
+  JPTcpSocket client(&log);
   std::string ip("127.0.0.1");
+  std::string *msg= new std::string();
   try{
-	  srv.setAddress(ip,9999);
+	  srv.setAddress(&ip,9999);
 	  srv.create();
 
 
-	  srv.bind(ip,9999);
+	  srv.bind(&ip,9999);
 	  sleep(5);
+	  srv.listen();
+	  int reqNum = 0;
+	  while( reqNum < 10 ){
+		  if( 0 == srv.accept(&client) )
+		  {
+			  client.receive(300,&msg);
+			  std::cout << "Received: " << msg->c_str();
 
-	  std::string * recv;
-	  srv.receive(100,&recv);
-	  std::cout << "the message received was: "<< *recv<< std::endl;
+			  msg->assign("Thanks for coming, now leave please!");
 
-	  std::string msg("pao com panado");
-	  srv.send(&msg);
-
-
-
-
-
+			  client.send(msg);
+			  sleep(1);
+			  client.disconnect();
+		  }
+		  std::cout << "request number: " << reqNum++;
+	  }
 	  srv.disconnect();
 
   }catch( SocketExceptions &e){

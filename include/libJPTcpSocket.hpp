@@ -21,7 +21,7 @@ namespace cppLibs{
 		 * @param address String with the ip address
 		 * @param port Integer with the number of the port
 		 */
-		JPTcpSocket(Logger * log, std::string address, int port);
+		JPTcpSocket(Logger * log, std::string * address, int port);
 		/**
 		 * Empty constructor
 		 * @param log Pointer to a logger
@@ -43,6 +43,16 @@ namespace cppLibs{
 		 * @return Integer 0 in case of success
 		 */
 		virtual int create();
+		/**
+		 * Listen on port IP
+		 * @return Integer 0 in case of success
+		 */
+		int listen();
+		/**
+		 * Listen on port IP
+		 * @return Integer 0 in case of success
+		 */
+		 int accept(JPSocket*);
 
 	};
 
@@ -55,7 +65,7 @@ namespace cppLibs{
 			 * @param address String with the ip address
 			 * @param port Integer with the number of the port
 			 */
-			JPNonBlockSocket(Logger * log, std::string address, int port);
+			JPNonBlockSocket(Logger * log, std::string * address, int port);
 			/**
 			 * Empty constructor
 			 * @param log Pointer to a logger

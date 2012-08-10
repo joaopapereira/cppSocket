@@ -25,13 +25,13 @@ namespace cppLibs{
 		 * @param addr IP Address of the socket
 		 * @return Integer 0 in case of error
 		 */
-		int setIp( std::string ip );
+		int setIp( std::string *ip, int port );
 		/**
 		 * Set Ip address of the socket
 		 * @param addr IP Address of the socket
 		 * @return Integer 0 in case of error
 		 */
-		int setIp( struct sockaddr address, socklen_t size );
+		int setIp( struct sockaddr *address, socklen_t size );
 		/**
 		 * function to retrieve
 		 * the IP
@@ -49,7 +49,7 @@ namespace cppLibs{
 		 * @param ip String with the IP
 		 * @return Version
 		 */
-		static int checkIpVersion( std::string ip );
+		static int checkIpVersion( std::string * ip );
 	protected:
 		/**
 		 * function to retrieve

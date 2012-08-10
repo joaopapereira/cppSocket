@@ -21,7 +21,7 @@ namespace cppLibs{
 		 * @param address String with the ip address
 		 * @param port Integer with the number of the port
 		 */
-		JPUdpSocket(Logger * log, std::string address, int port);
+		JPUdpSocket(Logger * log, std::string * address, int port);
 		/**
 		 * Empty constructor
 		 * @param log Pointer to a logger
@@ -43,6 +43,18 @@ namespace cppLibs{
 		 * @return Integer 0 in case of success
 		 */
 		virtual int create();
+		/**
+		 * Bind an the address with the socket
+		 * @return Integer 0 in case of success
+		 */
+		int bind();
+		/**
+		 * Bind an the address with the socket
+		 * @param address String with the ip address
+		 * @param port Integer with the number of the port
+		 * @return Integer 0 in case of success
+		 */
+		int bind(std::string * address, int port);
 	};
 
 

@@ -33,9 +33,9 @@ using namespace cppLibs;
  * @param address String with the ip address
  * @param port Integer with the number of the port
  */
-JPUdpSocket::JPUdpSocket(Logger * log, std::string address, int port)
+JPUdpSocket::JPUdpSocket(Logger * log, std::string* address, int port)
 	: JPSocket(log, address, port){
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPTcpSocket(%s,%d)", address.c_str(), port );
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPTcpSocket(%s,%d)", address->c_str(), port );
 }
 /**
  * Empty constructor
@@ -67,7 +67,31 @@ JPUdpSocket::~JPUdpSocket(){
 int
 JPUdpSocket::create(){
 	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPTcpSocket::create()");
-	return create_int(SOCK_STREAM, IPPROTO_TCP );
+	return create_int(SOCK_DGRAM, IPPROTO_UDP );
+}
+/**
+ * Bind an the address with the socket
+ * @return Integer 0 in case of success
+ */
+int
+JPUdpSocket::bind(){
+	int result = JPSocket::bind();
+	if( 0 == result )
+		connStab = 1;
+	return result;
+}
+/**
+ * Bind an the address with the socket
+ * @param address String with the ip address
+ * @param port Integer with the number of the port
+ * @return Integer 0 in case of success
+ */
+int
+JPUdpSocket::bind(std::string * address, int port){
+	int result = JPSocket::bind(address,port);
+	if( 0 == result )
+		connStab = 1;
+	return result;
 }
 /**
  * END }

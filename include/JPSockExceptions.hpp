@@ -138,5 +138,16 @@ namespace cppLibs{
 		 */
 		JPInvSocket(bool showErrno = false) throw():SocketExceptions("Invalid socket",showErrno){};
 	};
+	/**
+	 * Generalization classes with the Exceptions
+	 */
+	class JPNoConn: public SocketExceptions{
+	public:
+		/**
+		 * Constructor used when no message needs to be passed
+		 * @param showErrno Indicates if the ERRNO should be or not written
+		 */
+		JPNoConn() throw():SocketExceptions("A connection must be stablished first, use listen of connect method",false){};
+	};
 };
 #endif

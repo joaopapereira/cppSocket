@@ -14,7 +14,10 @@
  */
 
 #include <extlibs/libJPLogger.h>
-#include <libJPTcpSocket.hpp>
+#include <libJPUdpSocket.hpp>
+#include <JPSockExceptions.hpp>
+#include <stdlib.h>
+#include <errno.h>
 using namespace cppLibs;
 // With this option will disable the debug to screen and do not allow any default log to be written
 #define DEBUG 0
@@ -22,19 +25,37 @@ int main(void) {
   Logger log("/tmp/test.log");
   log.setLogLvl("SOC",M_LOG_MAX,M_LOG_ALLLVL);
 
-  JPTcpSocket cli(&log);
-  cli.create();
-  std::string ip("localhost");
-  cli.connect(ip,9999);
-  std::string msg("panado com pao");
-  cli.send(&msg);
+  JPUdpSocket srv(&log);
+  std::string ip("127.0.0.1");
+    std::string *msg= new std::string();
+    try{
+  	  srv.setAddress(&ip,9999);
+  	  srv.create();
 
-  std::string * recv;
-  cli.receive(100,&recv);
 
-  std::cout << "the message received was: "<< *recv<< std::endl;
+  	  srv.bind(&ip,9999);
+  	  sleep(5);
+  	  int reqNum = 0;
+  	  while( reqNum < 10 ){
+  		  if( 0 < srv.receive(300,&msg) )
+  		  {
+  			  srv.receive(300,&msg);
+  			  std::cout << "Received: " << msg->c_str();
 
-  cli.disconnect();
+  			  msg->assign("Thanks for coming, now leave please!");
+
+  			  srv.send(msg);
+  			  sleep(1);
+  		  }
+  		  std::cout << "request number: " << reqNum++;
+  	  }
+  	  srv.disconnect();
+
+    }catch( SocketExceptions &e){
+      std::cerr << e.what()<< std::endl;
+      std::cerr << errno << std::endl;
+      exit(-1);
+    }
 
 
 

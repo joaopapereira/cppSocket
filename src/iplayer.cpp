@@ -7,6 +7,7 @@
 #include <netdb.h>
 
 #include <JPIpClasses.hpp>
+#include <libJPSocket.hpp>
 
 using namespace cppLibs;
 
@@ -26,10 +27,11 @@ using namespace cppLibs;
 /**
  * Set Ip address of the socket
  * @param addr IP Address of the socket
+ * @param port Port number
  * @return Integer 0 in case of error
  */
 int
-JPIpAddress::setIp( std::string ip ){
+JPIpAddress::setIp( std::string *ip, int port ){
 	struct addrinfo hint, *res = NULL;
 	int ret;
 
@@ -37,7 +39,8 @@ JPIpAddress::setIp( std::string ip ){
 
 	hint.ai_family = PF_UNSPEC;
 
-	ret = getaddrinfo(ip.c_str(), NULL, &hint, &res);
+	ret = getaddrinfo(ip->c_str(), to_string(port).c_str(), &hint, &res);
+	std::cout <<ip->c_str();
 	memcpy(&address, res->ai_addr, res->ai_addrlen);
 	std::cout << "address:" << res->ai_addr<< std::endl;
 	return 0;
@@ -48,8 +51,8 @@ JPIpAddress::setIp( std::string ip ){
  * @return Integer 0 in case of error
  */
 int
-JPIpAddress::setIp( struct sockaddr address , socklen_t size){
-	memcpy(&this->address, &address, size);
+JPIpAddress::setIp( struct sockaddr *address , socklen_t size){
+	memcpy(&this->address, address, size);
 	return 0;
 }
 /**
@@ -90,7 +93,7 @@ JPIpAddress::JPIpAddress(const JPIpAddress& copyFrom){
  * @return Version
  */
 int
-JPIpAddress::checkIpVersion( std::string ip ){
+JPIpAddress::checkIpVersion( std::string * ip ){
 	struct addrinfo hint, *res = NULL;
 	int ret;
 
@@ -98,7 +101,7 @@ JPIpAddress::checkIpVersion( std::string ip ){
 
 	hint.ai_family = PF_UNSPEC;
 
-	ret = getaddrinfo(ip.c_str(), NULL, &hint, &res);
+	ret = getaddrinfo(ip->c_str(), NULL, &hint, &res);
 	if (ret) {
 		std::string err("Invalid address![");
 		err.append(gai_strerror(ret));
