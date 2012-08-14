@@ -11,9 +11,6 @@
 
 using namespace cppLibs;
 
-#define BUFFER_READ 50
-
-
 /**
  * CLASS: JPSocketIPv6
  * BEGIN {
@@ -61,9 +58,9 @@ JPIpAddress::setIp( struct sockaddr *address , socklen_t size){
  * @return Socket address structure
  */
 void
-JPIpAddress::int_getIp(char * result, int family){
+JPIpAddress::int_getIp(char * result, size_t size, int family){
 	inet_ntop(family,(struct sockaddr*)& address, result,
-			  sizeof(result));
+			  size);
 }
 
 /**
@@ -155,7 +152,7 @@ JPSocketIPv6::~JPSocketIPv6(){
 std::string
 JPSocketIPv6::getCharIp(){
 	char straddr[INET6_ADDRSTRLEN];
-	int_getIp(straddr,AF_INET6);
+	int_getIp(straddr,INET6_ADDRSTRLEN,AF_INET6);
 	return std::string(straddr);
 }
 /**
@@ -201,7 +198,7 @@ JPSocketIPv4::~JPSocketIPv4(){
 std::string
 JPSocketIPv4::getCharIp(){
 	char straddr[INET_ADDRSTRLEN];
-	int_getIp(straddr,AF_INET);
+	int_getIp(straddr,INET_ADDRSTRLEN,AF_INET);
 	return std::string(straddr);
 }
 

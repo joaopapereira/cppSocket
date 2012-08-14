@@ -35,7 +35,8 @@ using namespace cppLibs;
  */
 JPUdpSocket::JPUdpSocket(Logger * log, std::string* address, int port)
 	: JPSocket(log, address, port){
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPTcpSocket(%s,%d)", address->c_str(), port );
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPUdpSocket(%s,%d)", address->c_str(), port );
+	foreignAddress = NULL;
 }
 /**
  * Empty constructor
@@ -43,7 +44,8 @@ JPUdpSocket::JPUdpSocket(Logger * log, std::string* address, int port)
  */
 JPUdpSocket::JPUdpSocket(Logger * log )
 	:JPSocket( log ){
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPTcpSocket()");
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPUdpSocket()");
+	foreignAddress = NULL;
 }
 /**
  * Copy class constructor
@@ -53,6 +55,7 @@ JPUdpSocket::JPUdpSocket(Logger * log )
  */
 JPUdpSocket::JPUdpSocket( const JPUdpSocket& copyFrom )
 	:JPSocket(copyFrom){
+	*foreignAddress = *(copyFrom.foreignAddress);
 
 }
 /**
@@ -66,7 +69,7 @@ JPUdpSocket::~JPUdpSocket(){
  */
 int
 JPUdpSocket::create(){
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPTcpSocket::create()");
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPUdpSocket::create()");
 	return create_int(SOCK_DGRAM, IPPROTO_UDP );
 }
 /**
@@ -93,6 +96,32 @@ JPUdpSocket::bind(std::string * address, int port){
 		connStab = 1;
 	return result;
 }
+/**
+ * Bind an the address with the socket
+ * @param address String with the ip address
+ * @param port Integer with the number of the port
+ * @return Integer 0 in case of success
+ */
+int
+JPUdpSocket::send( std::string * msg ){
+	connStab = 1;
+	if( NULL == foreignAddress )
+		return this->sendTo(msg,this->address);
+	else
+		return this->sendTo(msg,foreignAddress);
+}
+/**
+ * Read a message from the socket
+ * @param strsize	Size of the message that want to be readed
+ * @param msg		String where the message will be placed
+ * @return Integer 0 in case of success
+ */
+int
+JPUdpSocket::receive(int strsize, std::string **msg){
+	connStab = 1;
+	return this->receiveFrom(strsize,msg,&foreignAddress);
+}
+
 /**
  * END }
  */

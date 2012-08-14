@@ -53,6 +53,7 @@ namespace cppLibs{
 			 * @return Integer 0 in case of success
 			 */
 			int send( std::string * msg );
+
 			/**
 			 * Read a message from the socket
 			 * @param strsize	Size of the message that want to be readed
@@ -60,6 +61,7 @@ namespace cppLibs{
 			 * @return Integer 0 in case of success
 			 */
 			int receive(int strsize, std::string **msg);
+
 			/**
 			 * Connects the socket to the address defined
 			 * @return Integer 0 in case of success
@@ -175,6 +177,13 @@ namespace cppLibs{
 			 * @return Integer 0 in case of success
 			 */
 			int handleAddress( struct sockaddr_storage address, socklen_t size );
+			/**
+			 * Alocate the memory needed by the address
+			 * @param addressFamily Address family the address belong to
+			 * @return Pointer to the newlly alocated address
+			 */
+
+			JPIpAddress* retrieveAddress( int addressFamily );
 
 			/**
 			 * Internal function used to write a message into
@@ -184,12 +193,26 @@ namespace cppLibs{
 			 */
 			int send_int( std::string * msg );
 			/**
+			 * Send a message to the socket
+			 * @param msg Message to be sent through the socket
+			 * @param to  Address to send message to
+			 * @return Integer 0 in case of success
+			 */
+			int sendTo(std::string * msg, JPIpAddress * to );
+			/**
 			 * Internal function used to read a message from the socket
 			 * @param strsize	Size of the message that want to be readed
 			 * @param msg		String where the message will be placed
 			 * @return Integer >0 Length read
 			 */
 			int receive_int(int strsize, std::string **msg);
+			/**
+			 * Read a message from the socket
+			 * @param strsize	Size of the message that want to be readed
+			 * @param msg		String where the message will be placed
+			 * @return Integer 0 in case of success
+			 */
+			int receiveFrom(int strsize, std::string **msg, JPIpAddress ** from);
 			/**
 			 * Creates the socket
 			 * @param type Specifies the communication semantics

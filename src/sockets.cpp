@@ -103,15 +103,8 @@ JPSocket::handleAddress( std::string *address, int port ){
 	}
 	if( NULL != this->address )
 		delete this->address;
-	if( AF_INET == addressVersion ){
-		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"Address handled is IPv4");
-		this->address = new JPSocketIPv4();
-		this->address->setIp(address,port);
-	}else{
-		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"Address handled is IPv6");
-		this->address = new JPSocketIPv6();
-		this->address->setIp(address,port);
-	}
+	this->address = retrieveAddress( addressVersion );
+	this->address->setIp(address,port);
 
 	this->port = port;
 }
@@ -125,14 +118,23 @@ int
 JPSocket::handleAddress( struct sockaddr_storage address, socklen_t size ){
 	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPSocket::handleAddress(%p,%d)", address, size);
 	addressVersion = address.ss_family;
+	this->address = retrieveAddress( addressVersion );
+	this->address->setIp((struct sockaddr*)&address,size);
+}
+/**
+ * Alocate the memory needed by the address
+ * @param addressFamily Address family the address belong to
+ * @return Pointer to the newlly alocated address
+ */
+
+JPIpAddress*
+JPSocket::retrieveAddress( int addressFamily ){
 	if( AF_INET == addressVersion ){
 		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"Address handled is IPv4");
-		this->address = new JPSocketIPv4();
-		this->address->setIp((struct sockaddr*)&address,size);
+		return new JPSocketIPv4();
 	}else{
 		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"Address handled is IPv6");
-		this->address = new JPSocketIPv6();
-		this->address->setIp((struct sockaddr*)&address,size);
+		return new JPSocketIPv6();
 	}
 }
 /**
@@ -232,6 +234,23 @@ JPSocket::send(std::string * msg){
 	return send_int( msg );
 }
 /**
+ * Send a message to the socket
+ * @param msg Message to be sent through the socket
+ * @param to  Address to send message to
+ * @return Integer 0 in case of success
+ */
+int 
+JPSocket::sendTo(std::string * msg, JPIpAddress * to ){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::sendTo(%s,%s)",msg->c_str(),to->getCharIp().c_str());
+	if( 1 != connStab )
+		throw JPNoConn();
+	if( sendto( socketfd, msg->data(), msg->size(),0,
+				to->getIp(),sizeof(*(to->getIp()))) != msg->size() ){
+		throw JPErrSend(true);
+	}
+	return 0;
+}
+/**
  * Read a message from the socket
  * @param strsize	Size of the message that want to be readed
  * @param msg		String where the message will be placed
@@ -244,7 +263,44 @@ JPSocket::receive(int strsize, std::string **msg){
 		throw JPNoConn();
 	return receive_int( strsize , msg );
 }
+/**
+ * Read a message from the socket
+ * @param strsize	Size of the message that want to be readed
+ * @param msg		String where the message will be placed
+ * @return Integer >0 in case of success
+ */
+int 
+JPSocket::receiveFrom(int strsize, std::string **msg, JPIpAddress ** from){
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::from(%d,NULL,%p)",strsize,from);
+	if( 1 != connStab )
+		throw JPNoConn();
 
+    char out[BUFFER_READ];
+    int n, length=0;
+    sockaddr_storage clntAddr;
+    socklen_t addrLen = sizeof(sockaddr_storage);
+    bzero(out,BUFFER_READ);
+    logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Starting the read loop");
+    while( 0 < (n = recvfrom(socketfd,out,BUFFER_READ,0,
+						(sockaddr *) &clntAddr, (socklen_t *) &addrLen) ) ) {
+        if( n > 0 ){
+            length += n;
+            (*msg)->append( out , n);
+            if( n < BUFFER_READ )
+                break;
+            bzero(out,BUFFER_READ);
+        }
+        logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"actually received: %s",(*msg)->c_str());
+    }
+    if( 0 == length ){
+        logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Error nothing from socket");
+        throw JPErrEmptySocket();
+    }
+    *from = this->retrieveAddress(clntAddr.ss_family);
+    (*from)->setIp((struct sockaddr *)&clntAddr,addrLen);
+
+	return length;
+}
 /**
  * Connects the socket to the address defined
  * @return Integer 0 in case of success

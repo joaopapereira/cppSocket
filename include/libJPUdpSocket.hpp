@@ -55,6 +55,25 @@ namespace cppLibs{
 		 * @return Integer 0 in case of success
 		 */
 		int bind(std::string * address, int port);
+		/**
+		 * Bind an the address with the socket
+		 * @param address String with the ip address
+		 * @param port Integer with the number of the port
+		 * @return Integer 0 in case of success
+		 */
+		int send( std::string * msg );
+		/**
+		 * Read a message from the socket
+		 * @param strsize	Size of the message that want to be readed
+		 * @param msg		String where the message will be placed
+		 * @return Integer 0 in case of success
+		 */
+		int receive(int strsize, std::string **msg);
+		private:
+		/**
+		 * Ip address
+		 */
+		JPIpAddress * foreignAddress;
 	};
 
 

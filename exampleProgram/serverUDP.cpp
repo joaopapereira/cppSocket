@@ -23,7 +23,7 @@ using namespace cppLibs;
 #define DEBUG 0
 int main(void) {
   Logger log("/tmp/test.log");
-  log.setLogLvl("SOC",M_LOG_MAX,M_LOG_ALLLVL);
+  log.setLogLvl("SOC",M_LOG_MIN,M_LOG_ALLLVL);
 
   JPUdpSocket srv(&log);
   std::string ip("127.0.0.1");

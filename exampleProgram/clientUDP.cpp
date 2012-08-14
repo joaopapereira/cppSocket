@@ -30,11 +30,10 @@ int main(void) {
   	  std::string ip("127.0.0.1");
       cli.setAddress(&ip,9999);
 	  cli.create();
-	  cli.connect(&ip,9999);
 	  std::string msg("panado com pao");
 	  cli.send(&msg);
 
-	  std::string * recv;
+	  std::string * recv = new std::string();
 	  cli.receive(100,&recv);
 
 	  std::cout << "the message received was: "<< *recv<< std::endl;
