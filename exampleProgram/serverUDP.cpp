@@ -39,7 +39,6 @@ int main(void) {
   	  while( reqNum < 10 ){
   		  if( 0 < srv.receive(300,&msg) )
   		  {
-  			  srv.receive(300,&msg);
   			  std::cout << "Received: " << msg->c_str();
 
   			  msg->assign("Thanks for coming, now leave please!");

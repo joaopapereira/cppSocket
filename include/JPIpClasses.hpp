@@ -56,8 +56,9 @@ namespace cppLibs{
 		 * the IP
 		 * @return Socket address structure
 		 */
-		void int_getIp(char * result,size_t size,int family);
+		void int_getIp(char * result, char * port);
 		sockaddr_storage address;
+		size_t addressSize;
 	};
 
 	class JPSocketIPv6: public JPIpAddress{

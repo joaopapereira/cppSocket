@@ -37,9 +37,10 @@ JPIpAddress::setIp( std::string *ip, int port ){
 	hint.ai_family = PF_UNSPEC;
 
 	ret = getaddrinfo(ip->c_str(), to_string(port).c_str(), &hint, &res);
-	std::cout <<ip->c_str();
+
 	memcpy(&address, res->ai_addr, res->ai_addrlen);
-	std::cout << "address:" << res->ai_addr<< std::endl;
+	addressSize = res->ai_addrlen;
+
 	return 0;
 }
 /**
@@ -58,9 +59,14 @@ JPIpAddress::setIp( struct sockaddr *address , socklen_t size){
  * @return Socket address structure
  */
 void
-JPIpAddress::int_getIp(char * result, size_t size, int family){
-	inet_ntop(family,(struct sockaddr*)& address, result,
-			  size);
+JPIpAddress::int_getIp(char * result, char * port){
+/*	inet_ntop(family,(struct sockaddr*)& address, result,
+			  size);*/
+	getnameinfo((struct sockaddr*)& address,addressSize,
+				result,sizeof(result),
+				port, sizeof(port),
+				NI_NUMERICHOST)	;
+
 }
 
 /**
@@ -152,8 +158,12 @@ JPSocketIPv6::~JPSocketIPv6(){
 std::string
 JPSocketIPv6::getCharIp(){
 	char straddr[INET6_ADDRSTRLEN];
-	int_getIp(straddr,INET6_ADDRSTRLEN,AF_INET6);
-	return std::string(straddr);
+	char port[NI_MAXSERV];
+	int_getIp(straddr,port);
+	std::string result(straddr);
+	result.append(":");
+	result.append(port);
+	return result;
 }
 /**
  * Public methods
@@ -198,8 +208,12 @@ JPSocketIPv4::~JPSocketIPv4(){
 std::string
 JPSocketIPv4::getCharIp(){
 	char straddr[INET_ADDRSTRLEN];
-	int_getIp(straddr,INET_ADDRSTRLEN,AF_INET);
-	return std::string(straddr);
+	char port[NI_MAXSERV];
+	int_getIp(straddr,port);
+	std::string result(straddr);
+	result.append(":");
+	result.append(port);
+	return result;
 }
 
 

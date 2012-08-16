@@ -122,9 +122,9 @@ JPSocket::handleAddress( struct sockaddr_storage address, socklen_t size ){
 	this->address->setIp((struct sockaddr*)&address,size);
 }
 /**
- * Alocate the memory needed by the address
+ * Allocate the memory needed by the address
  * @param addressFamily Address family the address belong to
- * @return Pointer to the newlly alocated address
+ * @return Pointer to the newly allocated address
  */
 
 JPIpAddress*
@@ -271,7 +271,7 @@ JPSocket::receive(int strsize, std::string **msg){
  */
 int 
 JPSocket::receiveFrom(int strsize, std::string **msg, JPIpAddress ** from){
-	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::from(%d,NULL,%p)",strsize,from);
+	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::receiveFrom(%d,NULL,%p)",strsize,from);
 	if( 1 != connStab )
 		throw JPNoConn();
 
@@ -430,46 +430,7 @@ JPSocket::setAddress( struct sockaddr_storage address , socklen_t size ){
 	logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_TRC,"JPSocket::setAddress(%p,%d)",&address,size);
 	handleAddress(address ,size );
 }
-#if 0
-/**
- * Check IP version
- * @param ip String with the IP
- * @return Version
- */
-int
-JPSocket::checkIpVersion( std::string ip ){
-	logger->log(JPSocket::moduleName,M_LOG_MIN,M_LOG_TRC,"checkIpVersion(%s)",ip.c_str());
-	struct addrinfo hint, *res = NULL;
-	int ret;
 
-	memset(&hint, '\0', sizeof hint);
-
-	hint.ai_family = PF_UNSPEC;
-	hint.ai_flags = AI_NUMERICHOST;
-
-	ret = getaddrinfo(ip.c_str(), NULL, &hint, &res);
-	if (ret) {
-		std::string err("Invalid address![");
-		err.append(gai_strerror(ret));
-		err.append("]");
-		logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_WRN,"Error on ip[%s] - [%s]",ip.c_str(),err.c_str());
-		throw SocketExceptions(err);
-	}
-	if(res->ai_family == AF_INET) {
-		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"IPv4 found[%s]",ip.c_str());
-		ret = AF_INET;
-	} else if (res->ai_family == AF_INET6) {
-		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"IPv6 found[%s]",ip.c_str());
-		ret = AF_INET6;
-	} else {
-		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"Unknown IP format[%s] format id:%d",ip.c_str(),res->ai_family);
-		throw SocketExceptions("Unknown address format");
-	}
-
-   freeaddrinfo(res);
-   return ret;
-}
-#endif
 
 /**
  * END }
