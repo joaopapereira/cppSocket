@@ -108,6 +108,8 @@ JPTcpSocket::accept(JPSocket* socket){
 	*socket = *this;
 	socketfd = oldsocket;
 	socket->setAddress(cliAddr, cliLen);
+	logger->log(moduleName,M_LOG_LOW,M_LOG_DBG,"Accepted a connection from[%s]",socket->getIp().c_str());
+
 
 
 

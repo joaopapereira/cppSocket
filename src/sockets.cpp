@@ -116,7 +116,7 @@ JPSocket::handleAddress( std::string *address, int port ){
  */
 int
 JPSocket::handleAddress( struct sockaddr_storage address, socklen_t size ){
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPSocket::handleAddress(%p,%d)", address, size);
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_TRC,"JPSocket::handleAddress(%p,%d)", &address, size);
 	addressVersion = address.ss_family;
 	this->address = retrieveAddress( addressVersion );
 	this->address->setIp((struct sockaddr*)&address,size);
@@ -311,7 +311,7 @@ JPSocket::connect(){
 	if( -1 == socketfd )
 		throw JPInvSocket();
 	const struct sockaddr *addr = address->getIp();
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Trying to connect on address[%s:%d]",address->getCharIp().c_str(),port);
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Trying to connect on address[%s]",address->getCharIp().c_str());
 	int connect_return = ::connect(socketfd, addr, sizeof(*addr));
 
 	if( -1 == connect_return )
@@ -344,7 +344,7 @@ JPSocket::bind(){
 		throw JPInvSocket();
 	const struct sockaddr* addr = address->getIp();
 
-	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Trying to bind on address[%s:%d]",address->getCharIp().c_str(),port);
+	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Trying to bind on address[%s]",address->getCharIp().c_str());
 
 
 	int bind_return = ::bind(socketfd, addr, sizeof(*addr));

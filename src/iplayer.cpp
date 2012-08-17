@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <stdlib.h>
 
 #include <JPIpClasses.hpp>
 #include <libJPSocket.hpp>
@@ -51,6 +52,7 @@ JPIpAddress::setIp( std::string *ip, int port ){
 int
 JPIpAddress::setIp( struct sockaddr *address , socklen_t size){
 	memcpy(&this->address, address, size);
+	addressSize = size;
 	return 0;
 }
 /**
@@ -59,14 +61,13 @@ JPIpAddress::setIp( struct sockaddr *address , socklen_t size){
  * @return Socket address structure
  */
 void
-JPIpAddress::int_getIp(char * result, char * port){
+JPIpAddress::int_getIp(char * result, int ipsize, char * port, int portsize){
 /*	inet_ntop(family,(struct sockaddr*)& address, result,
 			  size);*/
-	getnameinfo((struct sockaddr*)& address,addressSize,
-				result,sizeof(result),
-				port, sizeof(port),
-				NI_NUMERICHOST)	;
-
+	int res = getnameinfo((struct sockaddr*)& address,addressSize,
+				result,ipsize,
+				port, portsize,
+				NI_NUMERICHOST|NI_NUMERICSERV  );
 }
 
 /**
@@ -159,7 +160,7 @@ std::string
 JPSocketIPv6::getCharIp(){
 	char straddr[INET6_ADDRSTRLEN];
 	char port[NI_MAXSERV];
-	int_getIp(straddr,port);
+	int_getIp(straddr,INET_ADDRSTRLEN,port,NI_MAXSERV);
 	std::string result(straddr);
 	result.append(":");
 	result.append(port);
@@ -209,7 +210,7 @@ std::string
 JPSocketIPv4::getCharIp(){
 	char straddr[INET_ADDRSTRLEN];
 	char port[NI_MAXSERV];
-	int_getIp(straddr,port);
+	int_getIp(straddr,INET_ADDRSTRLEN,port,NI_MAXSERV);
 	std::string result(straddr);
 	result.append(":");
 	result.append(port);

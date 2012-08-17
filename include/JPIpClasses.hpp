@@ -56,7 +56,7 @@ namespace cppLibs{
 		 * the IP
 		 * @return Socket address structure
 		 */
-		void int_getIp(char * result, char * port);
+		void int_getIp(char * result, int ipsize, char * port, int portsize);
 		sockaddr_storage address;
 		size_t addressSize;
 	};
