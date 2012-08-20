@@ -3,7 +3,7 @@
 #include <string.h>
 #include <errno.h>
 
-using namespace cppLibs;
+using namespace jpCppLibs;
 /**
  * CLASS: SocketExceptions
  * BEGIN {

@@ -7,7 +7,7 @@
 
 #include <JPSocket.hpp>
 
-using namespace cppLibs;
+using namespace jpCppLibs;
 
 #define BUFFER_READ 50
 

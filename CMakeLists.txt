@@ -3,7 +3,15 @@
 #
 #
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-SET(CMAKE_BUILD_TYPE Debug)
+#####################################
+## Option part
+#####################################
+option(thrpool_build_samples "Build thread pool sample programs." OFF)
+option(compile_with_debug "Build library with debug." OFF)
+
+#####################################
+## Definition of environment
+#####################################
 IF( DEFINED ENV{INSTALL_LIB_DIR} )
    SET(INSTALL_LIBS $ENV{INSTALL_LIB_DIR}/ )
 ELSE()
@@ -14,27 +22,43 @@ IF( DEFINED ENV{INSTALL_INC_DIR} )
 ELSE()
    SET(INSTALL_INCS ${CMAKE_HOME_DIRECTORY}/include )
 ENDIF()
+
 IF( EXISTS ${INSTALL_LIBS}/libJPSockets.a )
 	return()
 ENDIF()
 
 
-set(CMAKE_CXX_FLAGS "-g")
-
-
 SET(LIBRARY_OUTPUT_PATH .)
 SET(EXECUTABLE_OUTPUT_PATH .)
 
+#####################################
+## Project name
+#####################################
 PROJECT ( JPSocketsLib CXX )
+
+#####################################
+## Include directories 
+#####################################
 INCLUDE_DIRECTORIES( include lib ${INSTALL_LIBS} ${INSTALL_INCS})
 
+#####################################
+## Folders to be build
+#####################################
 ADD_SUBDIRECTORY( src lib )
-ADD_SUBDIRECTORY( exampleProgram bin )
+#ADD_SUBDIRECTORY( exampleProgram bin )
+#####################################
+## Samples to be build
+#####################################
+if( thrpool_build_samples)
+	ADD_SUBDIRECTORY( exampleProgram bin )
+endif()
+
+
 #####################################
 # Search for needed lib
 #####################################
-FIND_LIBRARY( JPLoggerStatic REQUIRED)
-FIND_LIBRARY( LOGGER_LIBRARY NAMES logger
+FIND_LIBRARY(JPLoggerStatic REQUIRED)
+FIND_LIBRARY( LOGGER_LIBRARY NAMES JPLoggerStatic
                 PATHS ${LOCAL_LIBS} ${INSTALL_LIBS} )
 SET( LIBS ${LIBS} ${LOGGER_LIBRARY})
 message(${LIBS})
@@ -65,9 +89,14 @@ IF( UNIX )
    core core.*
    gmon.out
    *~
-   CMakeFiles 
-   bin
    lib
+   CMakeFiles
+   bin
+   install_*
+   cmake_install.cmake 
+   doc/docs/
+   doc/semaphore.dox
+
   )
 
   ADD_CUSTOM_COMMAND(
@@ -77,11 +106,23 @@ IF( UNIX )
     ARGS    -Rf CMakeTmp ${DISTCLEANED}
     TARGET  distclean
   )
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Generate Examples"
-    COMMAND make -C examples
-    TARGET  examples
-  )
 ENDIF( UNIX )
+if( compile_with_debug )
+	set(CMAKE_CXX_FLAGS "-DDEBUG=1")
+	set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+#####################################
+# add a target to generate API documentation with Doxygen
+#####################################
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/sockets.dox.in ${CMAKE_CURRENT_BINARY_DIR}/doc/sockets.dox @ONLY)
+	add_custom_target(docs
+			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doc/sockets.dox
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "Generating Semaphore documentation with Doxygen" VERBATIM
+)
+endif(DOXYGEN_FOUND)
 
 

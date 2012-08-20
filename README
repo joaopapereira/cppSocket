@@ -1,0 +1,71 @@
+Thread Pool library.
+=========
+
+https://github.com/joaopapereira/cppThreadPool.git
+
+Overview
+=========
+Library in C++ to implement Threads and Thread Pool mechanism
+
+This library implements a Thread class, and a Thread Pool class.
+The thread pool is designed in a way that only need to be defined 
+the function to be called in the pool and the arguments of it.
+There is a mechanism that handle the cycle inside each thread.
+The library also include a shared memory area for the pool that can
+be extended to hold all the needed information.
+
+
+Requirements for End Users
+=========
+
+For this library the git submodules that is setted in the folder
+modules is needed so the following commands must be issued:
+
+  git submodule update modules/logger
+  git submodule update modules/semaphore
+
+and then the location of installation of the library needed is done
+using the following commands:
+
+  cd modules/logger
+  INSTALL_INC_DIR=`pwd`/../../include INSTALL_LIB_DIR=`pwd`/../../lib cmake .
+  make install
+  
+  cd modules/semaphore
+  INSTALL_INC_DIR=`pwd`/../../include INSTALL_LIB_DIR=`pwd`/../../lib cmake .
+  make install
+  
+And the library can be found in lib folder in the top level.
+After this you may want to remove the not needed folder to do that
+use the following command on each submodule folder:
+  make distclean
+
+Building the library
+=========
+Thread Pool comes with a CMake build script (CMakeLists.txt) that can
+be used on a wide range of platforms ("C" stands for cross-platofrm.).
+If you don't have CMake installed already, you can download it for
+free from http://www.cmake.org/.
+
+CMake works by generating native makefiles or build projects that can
+be used in the compiler environment of your choice.  The typical
+workflow starts with:
+
+  mkdir mybuild       # Create a directory to hold the build output.
+  cd mybuild
+  cmake ${THRPOOL_DIR}  # Generate native build scripts.
+
+If you want to build 's samples, you should replace the
+last command with
+
+  cmake -Dthrpool_build_samples=ON ${THRPOOL_DIR}
+
+If you are on a *nix system, you should now see a Makefile in the
+current directory.  Just type 'make' to build logger.
+
+
+If you want to build 's library with debug, you should replace the
+command with
+
+  cmake -Dcompile_with_debug=ON ${THRPOOL_DIR}
+

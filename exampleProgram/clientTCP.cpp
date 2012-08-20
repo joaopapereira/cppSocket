@@ -13,16 +13,17 @@
  ============================================================================
  */
 
-#include <extlibs/libJPLogger.h>
+#include <extlibs/libJPLogger.hpp>
 #include <libJPTcpSocket.hpp>
 #include <JPSockExceptions.hpp>
 #include <stdlib.h>
 #include <errno.h>
-using namespace cppLibs;
+using namespace jpCppLibs;
 // With this option will disable the debug to screen and do not allow any default log to be written
 #define DEBUG 0
 int main(void) {
-  Logger log("/tmp/test.log");
+	jpCppLibs::Logger log("/tmp/test.log");
+
   log.setLogLvl("SOC",M_LOG_MIN,M_LOG_ALLLVL);
 
   JPTcpSocket cli(&log);

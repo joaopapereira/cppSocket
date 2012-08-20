@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <strings.h>
-#include <extlibs/libJPLogger.h>
+#include <extlibs/libJPLogger.hpp>
 #include <sstream>
 
 #include <JPSockExceptions.hpp>
@@ -15,7 +15,7 @@
 
 #include <JPSocket.hpp>
 
-namespace cppLibs{
+namespace jpCppLibs{
 	template <class T>
 	inline std::string to_string (const T& t)
 	{

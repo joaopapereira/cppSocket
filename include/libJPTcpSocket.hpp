@@ -6,11 +6,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <strings.h>
-#include <extlibs/libJPLogger.h>
+#include <extlibs/libJPLogger.hpp>
 
 #include <libJPSocket.hpp>
 
-namespace cppLibs{
+namespace jpCppLibs{
 	
 	class JPTcpSocket: public JPSocket{
 		public:

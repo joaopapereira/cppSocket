@@ -1,7 +1,7 @@
 #ifndef __JPSOCKEXCEPTIONS_HPP__
 #define __JPSOCKEXCEPTIONS_HPP__
 
-namespace cppLibs{
+namespace jpCppLibs{
 	/**
 	 * Class the implements the exceptions of the logger
 	 */

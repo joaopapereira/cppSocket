@@ -6,11 +6,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <strings.h>
-#include <extlibs/libJPLogger.h>
+#include <extlibs/libJPLogger.hpp>
 
 #include <JPIpClasses.hpp>
 
-namespace cppLibs{
+namespace jpCppLibs{
 
 	#define M_DISC_GRACE 0
 	#define M_DISC_FORCE 1

@@ -10,7 +10,7 @@
 #include <JPIpClasses.hpp>
 #include <libJPSocket.hpp>
 
-using namespace cppLibs;
+using namespace jpCppLibs;
 
 /**
  * CLASS: JPSocketIPv6
