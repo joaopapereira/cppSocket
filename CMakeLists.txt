@@ -6,7 +6,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 #####################################
 ## Option part
 #####################################
-option(thrpool_build_samples "Build thread pool sample programs." OFF)
+option(sockets_build_samples "Build sockets sample programs." OFF)
 option(compile_with_debug "Build library with debug." OFF)
 
 #####################################
@@ -49,7 +49,7 @@ ADD_SUBDIRECTORY( src lib )
 #####################################
 ## Samples to be build
 #####################################
-if( thrpool_build_samples)
+if( sockets_build_samples)
 	ADD_SUBDIRECTORY( exampleProgram bin )
 endif()
 

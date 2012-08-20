@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <strings.h>
-#include <extlibs/libJPLogger.hpp>
+#include <libJPLogger.hpp>
 
 #include <JPIpClasses.hpp>
 

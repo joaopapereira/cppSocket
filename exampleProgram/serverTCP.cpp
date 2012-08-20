@@ -13,7 +13,7 @@
  ============================================================================
  */
 
-#include <extlibs/libJPLogger.hpp>
+#include <libJPLogger.hpp>
 #include <libJPTcpSocket.hpp>
 #include <JPSockExceptions.hpp>
 #include <stdlib.h>
