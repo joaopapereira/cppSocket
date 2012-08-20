@@ -69,7 +69,7 @@ message(${INSTALL_LIBS})
 #####################################
 # Instalation section
 #####################################
-INSTALL( FILES include/libJPSocket.hpp
+INSTALL( FILES include/*JP*.hpp
          DESTINATION ${INSTALL_INCS} )
 
 INSTALL( FILES lib/libJPSockets.a
