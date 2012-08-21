@@ -69,7 +69,8 @@ message(${INSTALL_LIBS})
 #####################################
 # Instalation section
 #####################################
-INSTALL( FILES include/*JP*.hpp
+FILE(GLOB files "include/*.hpp")
+INSTALL( FILES ${files}
          DESTINATION ${INSTALL_INCS} )
 
 INSTALL( FILES lib/libJPSockets.a
