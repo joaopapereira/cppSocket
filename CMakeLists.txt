@@ -73,7 +73,9 @@ FILE(GLOB files "include/*.hpp")
 INSTALL( FILES ${files}
          DESTINATION ${INSTALL_INCS} )
 
-INSTALL( FILES lib/libJPSockets.a
+INSTALL( FILES lib/libJPSocketsStatic.a
+         DESTINATION ${INSTALL_LIBS} )
+INSTALL( FILES lib/libJPSockets.so
          DESTINATION ${INSTALL_LIBS} )
 
 
