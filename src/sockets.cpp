@@ -41,7 +41,7 @@ JPSocket::receive_int(int strsize, std::string **msg){
 
 	*msg = new std::string();
 	char out[BUFFER_READ];
-	int n, length=0;
+	int n=0, length=0;
 	bzero(out,BUFFER_READ);
 	logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Starting the read loop");
 	while( 0 < (n = recv(socketfd,out,BUFFER_READ,0) )){
@@ -54,7 +54,11 @@ JPSocket::receive_int(int strsize, std::string **msg){
 		}
 		logger->log(JPSocket::moduleName,M_LOG_LOW,M_LOG_DBG,"actually received: %s",(*msg)->c_str());
 	}
-	if( 0 == length ){
+	if( 0 == length && 0 == n ){
+		logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Other end disconnected");
+		throw JPDisconnected();
+	
+	}else if( 0 == length ){
 		logger->log(JPSocket::moduleName,M_LOG_NRM,M_LOG_DBG,"Error nothing from socket");
 		throw JPErrEmptySocket();
 	}

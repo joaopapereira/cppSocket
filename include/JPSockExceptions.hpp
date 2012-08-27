@@ -149,5 +149,17 @@ namespace jpCppLibs{
 		 */
 		JPNoConn() throw():SocketExceptions("A connection must be stablished first, use listen of connect method",false){};
 	};
+	/**
+	 * Generalization classes with the Exceptions
+	 */
+	class JPDisconnected: public SocketExceptions{
+	public:
+		/**
+		 * Constructor used when no message needs to be passed
+		 * @param showErrno Indicates if the ERRNO should be or not written
+		 */
+		JPDisconnected() throw():SocketExceptions("Other end disconnected",false){};
+	};
+
 };
 #endif
