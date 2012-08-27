@@ -214,7 +214,7 @@ int JPNonBlockSocket::selectRead(  struct timeval * waitd  ){
 	std::string err("Error while doing selectRead on socket[");
 	err.append(to_string(socketfd));
 	err.append("]");
-	if( res <= 0 ){
+	if( res < 0 ){
 		throw JPGenericSocket(err,true);
 	}else if( FD_ISSET(socketfd , &read_flags )  ){
 		return 0;
